@@ -41,14 +41,7 @@ router.put("/course/edit/:id", async (req, res) => {
     return res.status(400).send({ message: error.message });
   }
 
-  await Course.updateOne(
-    { _id: courseId },
-    {
-      $set: {
-        ...newValues,
-      },
-    }
-  );
+  await Course.updateOne({ _id: courseId }, { $set: { ...newValues } });
 
   return res.status(200).send({ message: "Course updated successfully" });
 });
