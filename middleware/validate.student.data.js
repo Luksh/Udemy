@@ -4,7 +4,7 @@ export const validateStudentDataFromReqBody = async (req, res, next) => {
   const newValues = req.body;
 
   try {
-    const validatedData = await studentValidationSchema.validate(newStudent);
+    const validatedData = await studentValidationSchema.validate(newValues);
 
     req.body = validatedData;
     next();
