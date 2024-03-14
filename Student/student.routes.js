@@ -1,6 +1,8 @@
 import express from "express";
 import Student from "./student.model.js";
 import { studentValidationSchema } from "./student.validation.js";
+import { validateMongoIdFromReqParams } from "../middleware/validate.id.js";
+import { validateStudentDataFromReqBody } from "../middleware/validate.student.data.js";
 
 const router = express.Router();
 
@@ -63,5 +65,44 @@ router.post(
     return res.status(201).send({ message: "Student is added successfully." });
   }
 );
+
+router.delete("/student/delete/:id", validateMongoIdFromReqParams, async (req, res) => {
+  const studentId = req.params.id;
+  const student = await Student.findOne({ _id: studentId });
+
+  if (!student) {
+    return res.status(404).send({ message: "Student does not exist." });
+  }
+
+  await Student.deleteOne({ _id: studentId });
+
+  return res.status(200).send({ message: "Student deleted successfully" });
+});
+
+router.get("/student/details/:id", validateMongoIdFromReqParams, async (req, res) => {
+  const studentId = req.params.id;
+  const student = await Student.findOne({ _id: studentId });
+
+  if (!student) {
+    return res.status(404).send({ message: "Student does not exist." });
+  }
+
+  return res.status(200).send({ message: "Success", studentDetails: student });
+});
+
+router.put("/student/edit/:id", validateMongoIdFromReqParams, validateStudentDataFromReqBody, async (req, res) => {
+  const studentId = req.params.id;
+  const newValues = req.body;
+
+  const student = await Student.findOne({ _id: studentId });
+
+  if (!student) {
+    return res.status(404).send({ message: "Student does not exist." });
+  }
+
+  await Student.updateOne({ _id: studentId }, { $set: { ...newValues } });
+
+  return res.status(200).send({ message: "Student updated successfully." });
+});
 
 export default router;
